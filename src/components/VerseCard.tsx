@@ -23,11 +23,11 @@ const VerseCard: React.FC<VerseCardProps> = ({
   return (
     <Card className="w-full bg-card text-card-foreground shadow-lg hover:shadow-xl transition-shadow duration-200 rounded-lg overflow-hidden border border-border hover:ring-2 hover:ring-primary/50">
       <CardHeader className="border-b-2 border-primary pb-3">
-        <div className="flex flex-col -gap-y-1"> {/* Added a flex container with negative gap */}
+        <div className="flex flex-col -gap-y-1">
           <CardTitle className="text-lg font-semibold text-primary mb-0">
             {surahName}
           </CardTitle>
-          <p className="text-sm text-emerald-500"> {/* Removed -mt-2, now controlled by flex gap */}
+          <p className="text-sm text-emerald-500">
             Surah {chapter}, Verse {verseNumber}
           </p>
         </div>
@@ -41,7 +41,7 @@ const VerseCard: React.FC<VerseCardProps> = ({
         </div>
         <div className="text-sm text-muted-foreground border-t-2 border-primary pt-4">
           <h3 className="font-medium mb-1 text-foreground">Explanation:</h3>
-          <p>{explanation}</p>
+          <p className="text-emerald-700 dark:text-emerald-300">{explanation}</p>
         </div>
       </CardContent>
     </Card>
