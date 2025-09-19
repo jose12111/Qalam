@@ -42,7 +42,6 @@ const QuranSearch: React.FC = () => {
   // Function to fetch explanation (using en.maududi for detailed English translation/notes)
   const fetchExplanation = useCallback(async (surahNumber: number, ayahNumber: number): Promise<string | null> => {
     try {
-      // Changed to en.maududi for a detailed English translation that often includes explanatory notes
       const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.maududi`);
       if (!explanationResponse.ok) {
         const errorText = await explanationResponse.text();
@@ -50,7 +49,6 @@ const QuranSearch: React.FC = () => {
         throw new Error(`Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
       }
       const explanationData = await explanationResponse.json();
-      // console.log("Explanation Data (Maududi):", JSON.stringify(explanationData, null, 2)); // Removed debugging log
       return explanationData.data.text;
     } catch (err) {
       console.error("Error fetching explanation (Maududi):", err);
@@ -78,22 +76,23 @@ const QuranSearch: React.FC = () => {
         throw new Error(`Failed to fetch search results from Quran API. Status: ${searchResponse.status}. Response: ${errorText}`);
       }
       const searchData = await searchResponse.json();
-      // console.log("Search Data:", JSON.stringify(searchData, null, 2)); // Removed debugging log
 
       if (searchData.data && searchData.data.matches && searchData.data.matches.length > 0) {
         const fetchedVerses: Verse[] = [];
         
-        // Fetch Arabic text and explanation for all matches concurrently
-        const versePromises = searchData.data.matches.map(async (match: any) => {
-          // Corrected checks and property access based on actual API response
+        // Limit to the first 10 matches for display
+        const matchesToProcess = searchData.data.matches.slice(0, 10); 
+        
+        // Fetch Arabic text and explanation for the selected matches concurrently
+        const versePromises = matchesToProcess.map(async (match: any) => {
           if (!match.surah || typeof match.numberInSurah === 'undefined' || !match.text) {
             console.warn("Skipping malformed match:", match);
             return null;
           }
 
           const surahNumber = match.surah.number;
-          const ayahNumber = match.numberInSurah; // Corrected: use numberInSurah
-          const englishText = match.text; // Corrected: use match.text directly
+          const ayahNumber = match.numberInSurah;
+          const englishText = match.text;
 
           const [arabicText, explanationText] = await Promise.all([
             fetchArabicText(surahNumber, ayahNumber),
@@ -123,7 +122,7 @@ const QuranSearch: React.FC = () => {
         setSearchResults(fetchedVerses);
 
         if (fetchedVerses.length > 0) {
-          toast.success("Search complete with explanations!", { id: loadingToastId });
+          toast.success(`Search complete! Displaying ${fetchedVerses.length} verses with explanations.`, { id: loadingToastId });
         } else {
           toast.info("Initial search found matches, but no complete verses with Arabic text and explanation could be retrieved.", { id: loadingToastId, duration: 5000 });
         }
