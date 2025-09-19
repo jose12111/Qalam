@@ -1,0 +1,16 @@
+{
+  "name": "Quran Explorer",
+  "short_name": "Quran",
+  "description": "Search and explore verses of the Holy Quran by topic. Discover the wisdom and guidance of the Holy Quran.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4CAF50",
+  "icons": [
+    {
+      "src": "/icon-book.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
