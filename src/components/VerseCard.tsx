@@ -40,7 +40,7 @@ const VerseCard: React.FC<VerseCardProps> = ({
           {arabic}
         </div>
         <div className="text-sm text-muted-foreground border-t-2 border-primary pt-4">
-          <h3 className="font-bold mb-1 text-foreground">Explanation:</h3> {/* Added font-bold here */}
+          <h3 className="font-bold mb-1 text-emerald-700 dark:text-emerald-300">Explanation:</h3> {/* Changed text-foreground to text-emerald-700 */}
           <p className="text-emerald-700 dark:text-emerald-300">{explanation}</p>
         </div>
       </CardContent>
