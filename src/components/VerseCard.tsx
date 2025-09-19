@@ -21,7 +21,7 @@ const VerseCard: React.FC<VerseCardProps> = ({
   surahName, // Destructure surahName
 }) => {
   return (
-    <Card className="w-full bg-card text-card-foreground shadow-md rounded-lg overflow-hidden border border-border">
+    <Card className="w-full bg-card text-card-foreground shadow-lg hover:shadow-xl transition-shadow duration-200 rounded-lg overflow-hidden border border-border hover:ring-2 hover:ring-primary/50">
       <CardHeader className="border-b border-border pb-3">
         <CardTitle className="text-base font-semibold text-primary truncate">
           Surah {surahName}, Surah {chapter} Verse {verseNumber}
