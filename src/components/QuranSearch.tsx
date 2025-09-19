@@ -76,7 +76,7 @@ const QuranSearch: React.FC = () => {
         throw new Error(`Failed to fetch search results from Quran API. Status: ${searchResponse.status}. Response: ${errorText}`);
       }
       const searchData = await searchResponse.json();
-      console.log("Search Data:", searchData); // Log the full search data
+      console.log("Search Data:", JSON.stringify(searchData, null, 2)); // Log the full search data as a string
 
       if (searchData.data && searchData.data.matches && searchData.data.matches.length > 0) {
         const fetchedVerses: Verse[] = [];
