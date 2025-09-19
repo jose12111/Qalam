@@ -141,7 +141,7 @@ const QuranSearch: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-3xl">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-900 dark:text-gray-50">
+      <h1 className="text-3xl font-bold text-center mb-6 text-foreground">
         Search the Quran
       </h1>
       <div className="flex w-full max-w-md items-center space-x-2 mx-auto mb-8">
@@ -164,11 +164,11 @@ const QuranSearch: React.FC = () => {
       </div>
 
       {error && (
-        <p className="text-center text-red-500 mb-4">{error}</p>
+        <p className="text-center text-destructive mb-4">{error}</p>
       )}
 
       {loading && searchResults.length === 0 && (
-        <p className="text-center text-gray-500 dark:text-gray-400">Loading verses and explanations...</p>
+        <p className="text-center text-muted-foreground">Loading verses and explanations...</p>
       )}
 
       <div className="space-y-4">
@@ -185,13 +185,13 @@ const QuranSearch: React.FC = () => {
           ))
         ) : (
           !loading && !error && searchTerm.trim() !== "" && (
-            <p className="text-center text-gray-500 dark:text-gray-400">
+            <p className="text-center text-muted-foreground">
               No verses found for your search term. Try 'Paradise' or 'Charity'!
             </p>
           )
         )}
         {!loading && !error && searchTerm.trim() === "" && (
-          <p className="text-center text-gray-500 dark:text-gray-400">
+          <p className="text-center text-muted-foreground">
             Enter a topic to search for Quranic verses.
           </p>
         )}

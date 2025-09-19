@@ -19,21 +19,21 @@ const VerseCard: React.FC<VerseCardProps> = ({
   verseNumber,
 }) => {
   return (
-    <Card className="w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-      <CardHeader className="border-b dark:border-gray-700 pb-3">
-        <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-50">
+    <Card className="w-full bg-card text-card-foreground shadow-md rounded-lg overflow-hidden border border-border">
+      <CardHeader className="border-b border-border pb-3">
+        <CardTitle className="text-xl font-semibold text-primary">
           Chapter {chapter}, Verse {verseNumber}
         </CardTitle>
-        <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+        <CardDescription className="text-sm text-muted-foreground">
           {english}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4 space-y-4">
-        <div className="text-right text-2xl font-arabic leading-relaxed text-gray-800 dark:text-gray-100">
+        <div className="text-right text-2xl font-arabic leading-relaxed text-foreground">
           {arabic}
         </div>
-        <div className="text-sm text-gray-700 dark:text-gray-300 border-t pt-4 dark:border-gray-700">
-          <h3 className="font-medium mb-1 text-gray-800 dark:text-gray-200">Explanation:</h3>
+        <div className="text-sm text-muted-foreground border-t border-border pt-4">
+          <h3 className="font-medium mb-1 text-foreground">Explanation:</h3>
           <p>{explanation}</p>
         </div>
       </CardContent>
