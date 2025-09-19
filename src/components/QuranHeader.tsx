@@ -8,8 +8,8 @@ const QuranHeader: React.FC = () => {
   return (
     <Card className="w-full max-w-3xl mb-8 bg-primary text-primary-foreground shadow-lg border border-primary">
       <CardHeader className="text-center">
-        <CardTitle className="text-4xl font-extrabold text-primary-foreground mb-2 flex items-center justify-center gap-3">
-          <div className="p-2 bg-primary-foreground/20 rounded-lg flex items-center justify-center"> {/* Added a div with styling */}
+        <CardTitle className="text-3xl font-extrabold text-primary-foreground mb-2 flex items-center justify-center gap-3"> {/* Changed text-4xl to text-3xl */}
+          <div className="p-2 bg-primary-foreground/20 rounded-lg flex items-center justify-center">
             <BookOpen className="h-10 w-10" />
           </div>
           Quran Explorer
