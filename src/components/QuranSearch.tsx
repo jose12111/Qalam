@@ -14,7 +14,7 @@ interface Verse {
   explanation: string;
   chapter: number;
   verseNumber: number;
-  surahName: string; // Added surahName
+  surahName: string;
 }
 
 const QuranSearch: React.FC = () => {
@@ -22,7 +22,7 @@ const QuranSearch: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Verse[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [surahNames, setSurahNames] = useState<Record<number, string>>({}); // State to store surah names
+  const [surahNames, setSurahNames] = useState<Record<number, string>>({});
 
   // Fetch surah names on component mount
   useEffect(() => {
@@ -44,7 +44,7 @@ const QuranSearch: React.FC = () => {
       }
     };
     fetchSurahList();
-  }, []); // Run once on mount
+  }, []);
 
   // Function to fetch Arabic text for a given verse
   const fetchArabicText = useCallback(async (surahNumber: number, ayahNumber: number): Promise<string | null> => {
@@ -59,6 +59,23 @@ const QuranSearch: React.FC = () => {
       return arabicData.data.text;
     } catch (err) {
       console.error("Error fetching Arabic text:", err);
+      return null;
+    }
+  }, []);
+
+  // Function to fetch English text (Sahih International) for a given verse
+  const fetchEnglishText = useCallback(async (surahNumber: number, ayahNumber: number): Promise<string | null> => {
+    try {
+      const englishResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.sahih`);
+      if (!englishResponse.ok) {
+        const errorText = await englishResponse.text();
+        console.error(`API Error: Failed to fetch English text for ${surahNumber}:${ayahNumber}. Status: ${englishResponse.status}. Response: ${errorText}`);
+        throw new Error(`Failed to fetch English text for ${surahNumber}:${ayahNumber}. Status: ${englishResponse.status}. Response: ${errorText}`);
+      }
+      const englishData = await englishResponse.json();
+      return englishData.data.text;
+    } catch (err) {
+      console.error("Error fetching English text:", err);
       return null;
     }
   }, []);
@@ -93,38 +110,65 @@ const QuranSearch: React.FC = () => {
     const loadingToastId = toast.loading("Searching for verses and explanations...");
 
     try {
-      // Search for the query in English translation (Sahih International edition)
-      const searchResponse = await fetch(`https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/en.sahih`);
-      if (!searchResponse.ok) {
-        const errorText = await searchResponse.text();
-        throw new Error(`Failed to fetch search results from Quran API. Status: ${searchResponse.status}. Response: ${errorText}`);
-      }
-      const searchData = await searchResponse.json();
+      const englishSearchUrl = `https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/en.sahih`;
+      const arabicSearchUrl = `https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/ar.quran-simple`;
 
-      if (searchData.data && searchData.data.matches && searchData.data.matches.length > 0) {
+      const [englishResponse, arabicResponse] = await Promise.all([
+        fetch(englishSearchUrl),
+        fetch(arabicSearchUrl),
+      ]);
+
+      let combinedMatches: any[] = [];
+
+      if (englishResponse.ok) {
+        const englishSearchData = await englishResponse.json();
+        if (englishSearchData.data && englishSearchData.data.matches) {
+          combinedMatches = combinedMatches.concat(englishSearchData.data.matches);
+        }
+      } else {
+        const errorText = await englishResponse.text();
+        console.error(`API Error: Failed to fetch English search results. Status: ${englishResponse.status}. Response: ${errorText}`);
+      }
+
+      if (arabicResponse.ok) {
+        const arabicSearchData = await arabicResponse.json();
+        if (arabicSearchData.data && arabicSearchData.data.matches) {
+          const existingVerseIds = new Set(combinedMatches.map(m => `${m.surah.number}:${m.numberInSurah}`));
+          arabicSearchData.data.matches.forEach((match: any) => {
+            const verseId = `${match.surah.number}:${match.numberInSurah}`;
+            if (!existingVerseIds.has(verseId)) {
+              combinedMatches.push(match);
+            }
+          });
+        }
+      } else {
+        const errorText = await arabicResponse.text();
+        console.error(`API Error: Failed to fetch Arabic search results. Status: ${arabicResponse.status}. Response: ${errorText}`);
+      }
+
+      if (combinedMatches.length > 0) {
         const fetchedVerses: Verse[] = [];
-        
         // Limit to the first 10 matches for display
-        const matchesToProcess = searchData.data.matches.slice(0, 10); 
-        
-        // Fetch Arabic text and explanation for the selected matches concurrently
+        const matchesToProcess = combinedMatches.slice(0, 10);
+
+        // Fetch Arabic text, English text, and explanation for the selected matches concurrently
         const versePromises = matchesToProcess.map(async (match: any) => {
-          if (!match.surah || typeof match.numberInSurah === 'undefined' || !match.text) {
+          if (!match.surah || typeof match.numberInSurah === 'undefined') {
             console.warn("Skipping malformed match:", match);
             return null;
           }
 
           const surahNumber = match.surah.number;
           const ayahNumber = match.numberInSurah;
-          const englishText = match.text;
-          const surahName = surahNames[surahNumber] || `Chapter ${surahNumber}`; // Get surah name
+          const surahName = surahNames[surahNumber] || `Chapter ${surahNumber}`;
 
-          const [arabicText, explanationText] = await Promise.all([
+          const [arabicText, englishText, explanationText] = await Promise.all([
             fetchArabicText(surahNumber, ayahNumber),
+            fetchEnglishText(surahNumber, ayahNumber), // Use the new function
             fetchExplanation(surahNumber, ayahNumber)
           ]);
 
-          if (arabicText && explanationText) {
+          if (arabicText && englishText && explanationText) {
             return {
               id: `${surahNumber}:${ayahNumber}`,
               arabic: arabicText,
@@ -132,7 +176,7 @@ const QuranSearch: React.FC = () => {
               explanation: explanationText,
               chapter: surahNumber,
               verseNumber: ayahNumber,
-              surahName: surahName, // Pass surah name
+              surahName: surahName,
             };
           }
           return null;
@@ -163,7 +207,7 @@ const QuranSearch: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, fetchArabicText, fetchExplanation, surahNames]); // Added surahNames to dependencies
+  }, [searchTerm, fetchArabicText, fetchEnglishText, fetchExplanation, surahNames]);
 
   return (
     <div className="container mx-auto p-4 max-w-3xl">
@@ -207,7 +251,7 @@ const QuranSearch: React.FC = () => {
               explanation={verse.explanation}
               chapter={verse.chapter}
               verseNumber={verse.verseNumber}
-              surahName={verse.surahName} // Pass surah name
+              surahName={verse.surahName}
             />
           ))
         ) : (
