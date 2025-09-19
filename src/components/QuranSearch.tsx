@@ -80,6 +80,12 @@ const QuranSearch: React.FC = () => {
         
         // Fetch Arabic text and explanation for all matches concurrently
         const versePromises = searchData.data.matches.map(async (match: any) => {
+          // Add checks for surah and ayah existence
+          if (!match.surah || !match.ayah) {
+            console.warn("Skipping malformed match:", match);
+            return null;
+          }
+
           const surahNumber = match.surah.number;
           const ayahNumber = match.ayah.number;
           const englishText = match.ayah.text;
