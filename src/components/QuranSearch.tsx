@@ -28,6 +28,7 @@ const QuranSearch: React.FC = () => {
       const arabicResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/ar.quran-simple`);
       if (!arabicResponse.ok) {
         const errorText = await arabicResponse.text();
+        console.error(`API Error: Failed to fetch Arabic text for ${surahNumber}:${ayahNumber}. Status: ${arabicResponse.status}. Response: ${errorText}`);
         throw new Error(`Failed to fetch Arabic text for ${surahNumber}:${ayahNumber}. Status: ${arabicResponse.status}. Response: ${errorText}`);
       }
       const arabicData = await arabicResponse.json();
@@ -44,6 +45,7 @@ const QuranSearch: React.FC = () => {
       const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.tafsir_al_muyassar`);
       if (!explanationResponse.ok) {
         const errorText = await explanationResponse.text();
+        console.error(`API Error: Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
         throw new Error(`Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
       }
       const explanationData = await explanationResponse.json();
@@ -116,7 +118,12 @@ const QuranSearch: React.FC = () => {
         });
 
         setSearchResults(fetchedVerses);
-        toast.success("Search complete with explanations!", { id: loadingToastId });
+
+        if (fetchedVerses.length > 0) {
+          toast.success("Search complete with explanations!", { id: loadingToastId });
+        } else {
+          toast.info("Initial search found matches, but no complete verses with Arabic text and explanation could be retrieved.", { id: loadingToastId, duration: 5000 });
+        }
       } else {
         setSearchResults([]);
         toast.info("No verses found for your search term.", { id: loadingToastId });
