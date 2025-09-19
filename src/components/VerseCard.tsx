@@ -23,10 +23,10 @@ const VerseCard: React.FC<VerseCardProps> = ({
   return (
     <Card className="w-full bg-card text-card-foreground shadow-lg hover:shadow-xl transition-shadow duration-200 rounded-lg overflow-hidden border border-border hover:ring-2 hover:ring-primary/50">
       <CardHeader className="border-b-2 border-primary pb-3">
-        <CardTitle className="text-lg font-semibold text-primary mb-0"> {/* Added mb-0 */}
+        <CardTitle className="text-lg font-semibold text-primary mb-0">
           {surahName}
         </CardTitle>
-        <p className="text-sm text-emerald-500 mt-0"> {/* Added mt-0 */}
+        <p className="text-sm text-emerald-500 -mt-1"> {/* Changed mt-0 to -mt-1 for a negative margin */}
           Surah {chapter}, Verse {verseNumber}
         </p>
         <CardDescription className="text-sm text-muted-foreground mt-2">
