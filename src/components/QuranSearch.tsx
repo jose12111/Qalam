@@ -39,10 +39,11 @@ const QuranSearch: React.FC = () => {
     }
   }, []);
 
-  // Function to fetch explanation (Tafsir Muyassar) for a given verse
+  // Function to fetch explanation (Tafsir Ibn Kathir) for a given verse
   const fetchExplanation = useCallback(async (surahNumber: number, ayahNumber: number): Promise<string | null> => {
     try {
-      const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.tafsir_al_muyassar`);
+      // Changed to en.tafisr_ibn_kathir for English explanation
+      const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.tafisr_ibn_kathir`);
       if (!explanationResponse.ok) {
         const errorText = await explanationResponse.text();
         console.error(`API Error: Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
