@@ -9,6 +9,7 @@ interface VerseCardProps {
   explanation: string;
   chapter: number;
   verseNumber: number;
+  surahName: string; // Added surahName
 }
 
 const VerseCard: React.FC<VerseCardProps> = ({
@@ -17,12 +18,13 @@ const VerseCard: React.FC<VerseCardProps> = ({
   explanation,
   chapter,
   verseNumber,
+  surahName, // Destructure surahName
 }) => {
   return (
     <Card className="w-full bg-card text-card-foreground shadow-md rounded-lg overflow-hidden border border-border">
       <CardHeader className="border-b border-border pb-3">
         <CardTitle className="text-xl font-semibold text-primary">
-          Chapter {chapter}, Verse {verseNumber}
+          Surah {surahName}, Surah {chapter} Verse {verseNumber}
         </CardTitle>
         <CardDescription className="text-sm text-muted-foreground">
           {english}

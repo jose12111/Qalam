@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import VerseCard from "./VerseCard";
@@ -14,6 +14,7 @@ interface Verse {
   explanation: string;
   chapter: number;
   verseNumber: number;
+  surahName: string; // Added surahName
 }
 
 const QuranSearch: React.FC = () => {
@@ -21,6 +22,29 @@ const QuranSearch: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Verse[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [surahNames, setSurahNames] = useState<Record<number, string>>({}); // State to store surah names
+
+  // Fetch surah names on component mount
+  useEffect(() => {
+    const fetchSurahList = async () => {
+      try {
+        const response = await fetch("https://api.alquran.cloud/v1/surah");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch surah list. Status: ${response.status}`);
+        }
+        const data = await response.json();
+        const namesMap: Record<number, string> = {};
+        data.data.forEach((surah: any) => {
+          namesMap[surah.number] = surah.englishName;
+        });
+        setSurahNames(namesMap);
+      } catch (err) {
+        console.error("Error fetching surah list:", err);
+        toast.error("Failed to load Surah names.");
+      }
+    };
+    fetchSurahList();
+  }, []); // Run once on mount
 
   // Function to fetch Arabic text for a given verse
   const fetchArabicText = useCallback(async (surahNumber: number, ayahNumber: number): Promise<string | null> => {
@@ -93,6 +117,7 @@ const QuranSearch: React.FC = () => {
           const surahNumber = match.surah.number;
           const ayahNumber = match.numberInSurah;
           const englishText = match.text;
+          const surahName = surahNames[surahNumber] || `Chapter ${surahNumber}`; // Get surah name
 
           const [arabicText, explanationText] = await Promise.all([
             fetchArabicText(surahNumber, ayahNumber),
@@ -107,6 +132,7 @@ const QuranSearch: React.FC = () => {
               explanation: explanationText,
               chapter: surahNumber,
               verseNumber: ayahNumber,
+              surahName: surahName, // Pass surah name
             };
           }
           return null;
@@ -137,7 +163,7 @@ const QuranSearch: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, fetchArabicText, fetchExplanation]);
+  }, [searchTerm, fetchArabicText, fetchExplanation, surahNames]); // Added surahNames to dependencies
 
   return (
     <div className="container mx-auto p-4 max-w-3xl">
@@ -181,6 +207,7 @@ const QuranSearch: React.FC = () => {
               explanation={verse.explanation}
               chapter={verse.chapter}
               verseNumber={verse.verseNumber}
+              surahName={verse.surahName} // Pass surah name
             />
           ))
         ) : (
