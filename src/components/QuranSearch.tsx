@@ -42,7 +42,6 @@ const QuranSearch: React.FC = () => {
   // Function to fetch explanation (Tafsir Ibn Kathir) for a given verse
   const fetchExplanation = useCallback(async (surahNumber: number, ayahNumber: number): Promise<string | null> => {
     try {
-      // Changed to en.tafisr_ibn_kathir for English explanation
       const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.tafisr_ibn_kathir`);
       if (!explanationResponse.ok) {
         const errorText = await explanationResponse.text();
@@ -50,6 +49,7 @@ const QuranSearch: React.FC = () => {
         throw new Error(`Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
       }
       const explanationData = await explanationResponse.json();
+      console.log("Explanation Data:", JSON.stringify(explanationData, null, 2)); // Log the full explanation data
       return explanationData.data.text;
     } catch (err) {
       console.error("Error fetching explanation:", err);
