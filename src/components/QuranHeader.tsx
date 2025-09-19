@@ -10,7 +10,7 @@ const QuranHeader: React.FC = () => {
         <CardTitle className="text-4xl font-extrabold text-primary-foreground mb-2">
           Quran Explorer
         </CardTitle>
-        <CardDescription className="text-base text-primary-foreground/80 leading-relaxed">
+        <CardDescription className="text-lg text-primary-foreground/80 leading-relaxed">
           Search and explore verses of the Holy Quran by topic. Discover the wisdom and guidance with Arabic text, English translations, and detailed explanations.
         </CardDescription>
       </CardHeader>
