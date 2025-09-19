@@ -39,20 +39,21 @@ const QuranSearch: React.FC = () => {
     }
   }, []);
 
-  // Function to fetch explanation (Tafsir Ibn Kathir) for a given verse
+  // Function to fetch explanation (using en.maududi for detailed English translation/notes)
   const fetchExplanation = useCallback(async (surahNumber: number, ayahNumber: number): Promise<string | null> => {
     try {
-      const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.tafisr_ibn_kathir`);
+      // Changed to en.maududi for a detailed English translation that often includes explanatory notes
+      const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.maududi`);
       if (!explanationResponse.ok) {
         const errorText = await explanationResponse.text();
         console.error(`API Error: Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
         throw new Error(`Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
       }
       const explanationData = await explanationResponse.json();
-      console.log("Explanation Data:", JSON.stringify(explanationData, null, 2)); // Log the full explanation data
+      // console.log("Explanation Data (Maududi):", JSON.stringify(explanationData, null, 2)); // Removed debugging log
       return explanationData.data.text;
     } catch (err) {
-      console.error("Error fetching explanation:", err);
+      console.error("Error fetching explanation (Maududi):", err);
       return null;
     }
   }, []);
