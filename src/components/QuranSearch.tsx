@@ -17,6 +17,29 @@ interface Verse {
   surahName: string;
 }
 
+// A map for common Arabic transliterations to their English equivalents
+const arabicTransliterationMap: Record<string, string> = {
+  "jannah": "paradise",
+  "sadaqa": "charity",
+  "salat": "prayer",
+  "zakat": "alms",
+  "deen": "religion",
+  "dunya": "world",
+  "akhirah": "hereafter",
+  "taqwa": "piety",
+  "iman": "faith",
+  "kufr": "disbelief",
+  "shirk": "polytheism",
+  "haram": "forbidden",
+  "halal": "permissible",
+  "ummah": "community",
+  "sunnah": "tradition",
+  "hadith": "saying",
+  "quran": "quran",
+  "islam": "islam",
+  "allah": "god",
+};
+
 const QuranSearch: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Verse[]>([]);
@@ -110,40 +133,39 @@ const QuranSearch: React.FC = () => {
     const loadingToastId = toast.loading("Searching for verses and explanations...");
 
     try {
-      const englishSearchUrl = `https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/en.sahih`;
-      const arabicSearchUrl = `https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/ar.quran-simple`;
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      const englishEquivalent = arabicTransliterationMap[lowerCaseSearchTerm];
 
-      const [englishResponse, arabicResponse] = await Promise.all([
-        fetch(englishSearchUrl),
-        fetch(arabicSearchUrl),
-      ]);
+      const searchPromises = [];
+      // Always search the original term in English and Arabic
+      searchPromises.push(fetch(`https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/en.sahih`));
+      searchPromises.push(fetch(`https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/ar.quran-simple`));
 
-      let combinedMatches: any[] = [];
-
-      if (englishResponse.ok) {
-        const englishSearchData = await englishResponse.json();
-        if (englishSearchData.data && englishSearchData.data.matches) {
-          combinedMatches = combinedMatches.concat(englishSearchData.data.matches);
-        }
-      } else {
-        const errorText = await englishResponse.text();
-        console.error(`API Error: Failed to fetch English search results. Status: ${englishResponse.status}. Response: ${errorText}`);
+      // If a transliterated term has an English equivalent, search for that too
+      if (englishEquivalent && englishEquivalent !== lowerCaseSearchTerm) {
+        searchPromises.push(fetch(`https://api.alquran.cloud/v1/search/${encodeURIComponent(englishEquivalent)}/all/en.sahih`));
       }
 
-      if (arabicResponse.ok) {
-        const arabicSearchData = await arabicResponse.json();
-        if (arabicSearchData.data && arabicSearchData.data.matches) {
-          const existingVerseIds = new Set(combinedMatches.map(m => `${m.surah.number}:${m.numberInSurah}`));
-          arabicSearchData.data.matches.forEach((match: any) => {
-            const verseId = `${match.surah.number}:${match.numberInSurah}`;
-            if (!existingVerseIds.has(verseId)) {
-              combinedMatches.push(match);
-            }
-          });
+      const responses = await Promise.all(searchPromises);
+      let combinedMatches: any[] = [];
+      const existingVerseIds = new Set<string>();
+
+      for (const response of responses) {
+        if (response.ok) {
+          const searchData = await response.json();
+          if (searchData.data && searchData.data.matches) {
+            searchData.data.matches.forEach((match: any) => {
+              const verseId = `${match.surah.number}:${match.numberInSurah}`;
+              if (!existingVerseIds.has(verseId)) {
+                combinedMatches.push(match);
+                existingVerseIds.add(verseId);
+              }
+            });
+          }
+        } else {
+          const errorText = await response.text();
+          console.error(`API Error: Failed to fetch search results. Status: ${response.status}. Response: ${errorText}`);
         }
-      } else {
-        const errorText = await arabicResponse.text();
-        console.error(`API Error: Failed to fetch Arabic search results. Status: ${arabicResponse.status}. Response: ${errorText}`);
       }
 
       if (combinedMatches.length > 0) {
@@ -164,7 +186,7 @@ const QuranSearch: React.FC = () => {
 
           const [arabicText, englishText, explanationText] = await Promise.all([
             fetchArabicText(surahNumber, ayahNumber),
-            fetchEnglishText(surahNumber, ayahNumber), // Use the new function
+            fetchEnglishText(surahNumber, ayahNumber),
             fetchExplanation(surahNumber, ayahNumber)
           ]);
 
