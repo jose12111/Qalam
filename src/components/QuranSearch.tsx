@@ -76,22 +76,22 @@ const QuranSearch: React.FC = () => {
         throw new Error(`Failed to fetch search results from Quran API. Status: ${searchResponse.status}. Response: ${errorText}`);
       }
       const searchData = await searchResponse.json();
-      console.log("Search Data:", JSON.stringify(searchData, null, 2)); // Log the full search data as a string
+      // console.log("Search Data:", JSON.stringify(searchData, null, 2)); // Removed debugging log
 
       if (searchData.data && searchData.data.matches && searchData.data.matches.length > 0) {
         const fetchedVerses: Verse[] = [];
         
         // Fetch Arabic text and explanation for all matches concurrently
         const versePromises = searchData.data.matches.map(async (match: any) => {
-          // Add checks for surah and ayah existence
-          if (!match.surah || !match.ayah) {
+          // Corrected checks and property access based on actual API response
+          if (!match.surah || typeof match.numberInSurah === 'undefined' || !match.text) {
             console.warn("Skipping malformed match:", match);
             return null;
           }
 
           const surahNumber = match.surah.number;
-          const ayahNumber = match.ayah.number;
-          const englishText = match.ayah.text;
+          const ayahNumber = match.numberInSurah; // Corrected: use numberInSurah
+          const englishText = match.text; // Corrected: use match.text directly
 
           const [arabicText, explanationText] = await Promise.all([
             fetchArabicText(surahNumber, ayahNumber),
@@ -130,7 +130,7 @@ const QuranSearch: React.FC = () => {
         toast.info("No verses found for your search term.", { id: loadingToastId });
       }
     } catch (err) {
-      console.error("Search error:", err); // This will now log a more detailed error object
+      console.error("Search error:", err);
       setError("Failed to perform search. Please try again later.");
       toast.error("Failed to perform search.", { id: loadingToastId });
     } finally {
