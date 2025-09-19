@@ -21,7 +21,7 @@ const VerseCard: React.FC<VerseCardProps> = ({
   surahName,
 }) => {
   return (
-    <Card className="w-full bg-card text-card-foreground shadow-lg hover:shadow-xl transition-shadow duration-200 rounded-lg overflow-hidden border border-border hover:ring-2 hover:ring-primary/50">
+    <Card className="w-full bg-emerald-100 dark:bg-emerald-900 text-card-foreground shadow-2xl hover:shadow-xl transition-shadow duration-200 rounded-lg overflow-hidden border border-border hover:ring-2 hover:ring-primary/50">
       <CardHeader className="border-b-2 border-primary pb-3">
         <div className="flex flex-col -gap-y-1">
           <CardTitle className="text-lg font-semibold text-primary mb-0">
@@ -40,7 +40,7 @@ const VerseCard: React.FC<VerseCardProps> = ({
           {arabic}
         </div>
         <div className="text-sm text-muted-foreground border-t-2 border-primary pt-4">
-          <h3 className="font-bold mb-1 text-emerald-700 dark:text-emerald-300">Explanation:</h3> {/* Changed text-foreground to text-emerald-700 */}
+          <h3 className="font-bold mb-1 text-emerald-700 dark:text-emerald-300">Explanation:</h3>
           <p className="text-emerald-700 dark:text-emerald-300">{explanation}</p>
         </div>
       </CardContent>
