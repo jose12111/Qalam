@@ -26,7 +26,7 @@ const VerseCard: React.FC<VerseCardProps> = ({
         <CardTitle className="text-lg font-semibold text-primary mb-0">
           {surahName}
         </CardTitle>
-        <p className="text-sm text-emerald-500 -mt-1"> {/* Changed mt-0 to -mt-1 for a negative margin */}
+        <p className="text-sm text-emerald-500 -mt-2"> {/* Changed -mt-1 to -mt-2 */}
           Surah {chapter}, Verse {verseNumber}
         </p>
         <CardDescription className="text-sm text-muted-foreground mt-2">
