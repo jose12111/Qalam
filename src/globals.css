@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%; /* Very light off-white */
-    --foreground: 220 10% 20%; /* Dark muted blue-gray */
+    --background: 140 20% 15%; /* Dark desaturated green for light mode background */
+    --foreground: 0 0% 98%; /* Light off-white for text on dark background */
 
     --card: 0 0% 100%; /* Pure white for cards */
     --card-foreground: 220 10% 20%;
@@ -45,7 +45,7 @@
   }
 
   .dark {
-    --background: 220 20% 10%; /* Deep muted blue-gray */
+    --background: 140 20% 10%; /* Even darker desaturated green for dark mode background */
     --foreground: 210 20% 90%; /* Light muted blue-gray */
 
     --card: 220 20% 15%; /* Slightly lighter dark for cards */
