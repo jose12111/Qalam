@@ -29,7 +29,7 @@ const VerseCard: React.FC<VerseCardProps> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="p-4 space-y-4">
-        <div className="text-right text-2xl font-arabic leading-relaxed text-foreground">
+        <div className="text-right text-2xl font-arabic leading-relaxed text-foreground bg-emerald-50 dark:bg-emerald-900 p-3 rounded-md">
           {arabic}
         </div>
         <div className="text-sm text-muted-foreground border-t border-border pt-4">
