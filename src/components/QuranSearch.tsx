@@ -27,7 +27,8 @@ const QuranSearch: React.FC = () => {
     try {
       const arabicResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/ar.quran-simple`);
       if (!arabicResponse.ok) {
-        throw new Error(`Failed to fetch Arabic text for ${surahNumber}:${ayahNumber}`);
+        const errorText = await arabicResponse.text();
+        throw new Error(`Failed to fetch Arabic text for ${surahNumber}:${ayahNumber}. Status: ${arabicResponse.status}. Response: ${errorText}`);
       }
       const arabicData = await arabicResponse.json();
       return arabicData.data.text;
@@ -42,7 +43,8 @@ const QuranSearch: React.FC = () => {
     try {
       const explanationResponse = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/en.tafsir_al_muyassar`);
       if (!explanationResponse.ok) {
-        throw new Error(`Failed to fetch explanation for ${surahNumber}:${ayahNumber}`);
+        const errorText = await explanationResponse.text();
+        throw new Error(`Failed to fetch explanation for ${surahNumber}:${ayahNumber}. Status: ${explanationResponse.status}. Response: ${errorText}`);
       }
       const explanationData = await explanationResponse.json();
       return explanationData.data.text;
@@ -68,7 +70,8 @@ const QuranSearch: React.FC = () => {
       // Search for the query in English translation (Sahih International edition)
       const searchResponse = await fetch(`https://api.alquran.cloud/v1/search/${encodeURIComponent(searchTerm)}/all/en.sahih`);
       if (!searchResponse.ok) {
-        throw new Error("Failed to fetch search results from Quran API.");
+        const errorText = await searchResponse.text();
+        throw new Error(`Failed to fetch search results from Quran API. Status: ${searchResponse.status}. Response: ${errorText}`);
       }
       const searchData = await searchResponse.json();
 
@@ -113,7 +116,7 @@ const QuranSearch: React.FC = () => {
         toast.info("No verses found for your search term.", { id: loadingToastId });
       }
     } catch (err) {
-      console.error("Search error:", err);
+      console.error("Search error:", err); // This will now log a more detailed error object
       setError("Failed to perform search. Please try again later.");
       toast.error("Failed to perform search.", { id: loadingToastId });
     } finally {
